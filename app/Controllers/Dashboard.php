@@ -78,7 +78,7 @@ class Dashboard extends BaseController {
 
         $pusher = new Pusher($app_key, $app_secret, $app_id, ['cluster' => $app_cluster]);
 
-        $pusherData = array('token' => $roomName,'receiver' => $receiver,'sessionID' => $sessionID, );
+        $pusherData = array('token' => $roomName,'receiver' => $receiver,'sessionID' => $sessionID, 'type' => 'startcall', );
         $pusher->trigger('arenatest', 'call_event', $pusherData);
 
         echo json_encode([
@@ -133,7 +133,7 @@ class Dashboard extends BaseController {
         $sessionID = $_POST['sessionID'];
 
         $videoCallSessionModel = new VideoCallSessionModel();
-        $videoCallSessionModel->endSession($sessionID);
+        $data = $videoCallSessionModel->endSession($sessionID);
 
         $url = "https://{$METERED_DOMAIN}/api/v1/room/$token";
 
@@ -156,6 +156,15 @@ class Dashboard extends BaseController {
 
         // Handle the response as needed
         if ($response !== false) {echo $response;} else {echo 'DELETE request failed';}
+
+        $app_id = config('Pusher')->app_id; 
+        $app_key = config('Pusher')->key; 
+        $app_secret = config('Pusher')->secret; 
+        $app_cluster = config('Pusher')->cluster;
+        $pusher = new Pusher($app_key, $app_secret, $app_id, ['cluster' => $app_cluster]);
+
+        $pusherData = array('session' => $data, 'type' => 'endcall', );
+        $pusher->trigger('arenatest', 'call_event', $pusherData);
 
     }
 
