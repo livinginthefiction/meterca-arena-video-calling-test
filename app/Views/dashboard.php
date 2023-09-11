@@ -67,7 +67,7 @@
                             <div id="remote-button" class="w-100">
                                 <!-- <div class="mb-2 rounded-md" id="remote-video-container"></div> -->
                                 <!-- <input type="text" id="jr" class="appearance-none block w-full bg-white-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" placeholder="Enter Room Name"> -->
-                                <input type="text" id="idjr" value="<?= session('user')['username'] ?>" readonly class="appearance-none block w-full bg-white-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" placeholder="Enter Room Name">
+                                <input type="hidden" id="idjr" value="<?= session('user')['username'] ?>" readonly class="appearance-none block w-full bg-white-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" placeholder="Enter Room Name">
                                 <input type="hidden" value="" id="jrsessionid">
                                 <input type="hidden" value="" id="token">
                                 <div class="flex">
@@ -124,6 +124,9 @@
             </div>
         </div> 
     </div>
+
+
+
 <script type="text/javascript">
 
 let meetingJoined = false;
@@ -141,6 +144,7 @@ let meetingInfo = {};
         $("#remote-button").hide();
         $("#endRoom").hide();
         $("#miccam").hide();
+        
     });
 
     async function initializeView() {
@@ -162,8 +166,10 @@ let meetingInfo = {};
     }
 
     async function endroom() {
+        await meeting.leaveMeeting();
         let token = $("#token").val();
         let jrsessionid = $("#jrsessionid").val();
+        // $("#popup-modal").show(); 
 
         $.ajax({
             url: '/dashboard/endroom',
@@ -219,7 +225,7 @@ let meetingInfo = {};
             $("#miccam").show();
           /** If camera button is clicked on the meeting view then sharing the camera after joining the meeting.*/
 
-          // if (cameraOn) {
+          if (cameraOn) {
             cameraOn = true
             await meeting.startVideo();
             localVideoStream = await meeting.getLocalVideoStream();
@@ -228,16 +234,16 @@ let meetingInfo = {};
             $("#localVideoTag")[0].play();
             $("#toggleCamera").removeClass("bg-red-600");
             $("#toggleCamera").addClass("bg-green-600");
-          // }
+          }
 
           
           /**Microphone button is clicked on the meeting view then   sharing the microphone after joining the meeting */
-          // if (micOn) {
+          if (micOn) {
             micOn = true;
             $("#toggleMicrophone").removeClass("bg-red-600");
             $("#toggleMicrophone").addClass("bg-green-600");
             await meeting.startAudio();
-          // }
+          }
 
         } catch (ex) {
           console.log("Error occurred when joining the meeting", ex);
@@ -256,6 +262,7 @@ let meetingInfo = {};
             success: function(data, textStatus, jqXHR) {
                 $("#endRoom").show();
                 $("#token").val(data.token);
+                $("#jrsessionid").val(data.sessionID);
                 console.log('Request successful');
                 console.log('Data:', data);
                 startroom(data.username,data.metered_domain,data.token);
@@ -280,8 +287,10 @@ let meetingInfo = {};
             success: function(data, textStatus, jqXHR) {
                 console.log('Request successful');
                 console.log('Data:', data);
+                $("#remote-button").hide();
+                $("#endRoom").show();
                 startroom(data.username,data.metered_domain,data.token);
-                var timer = setTimeout(function() {endroom();}, 60000);
+                var timer = setTimeout(function() {endroom();console.log('endrooms')}, 60000);
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error('Request failed');
@@ -293,7 +302,7 @@ let meetingInfo = {};
 
 
     $("#endRoom").on("click", async function() {
-        await meeting.leaveMeeting();
+        // await meeting.leaveMeeting();
         $("#remote-button").hide();
         $("#endRoom").hide();
         endroom();
@@ -452,12 +461,16 @@ let meetingInfo = {};
 
     var channel = pusher.subscribe('arenatest');
     channel.bind('call_event', function(data) {
+        console.log('pusher data',data);
         document.getElementById('jrsessionid').value=data.sessionID;
         document.getElementById('token').value=data.token;
-        if (data.receiver== <?= session('user')['userid'] ?> ) {
-         // data=JSON.parse(data);
-            console.log(data);
-            document.getElementById('remote-button').style.display = 'block'; 
+        if (data.receiver== <?= session('user')['userid'] ?> && data.type=='startcall') {
+            // document.getElementById('remote-button').style.display = 'block'; 
+            $("#remote-button").show();
+        }
+        if ((data.session.callerid== <?= session('user')['userid'] ?> || data.session.receiverid == <?= session('user')['userid'] ?> )&& data.type=="endcall") {
+            alert("Call Ended successfully");
+            var timer = setTimeout(function() {location.reload();}, 5000);
         }
         
     });

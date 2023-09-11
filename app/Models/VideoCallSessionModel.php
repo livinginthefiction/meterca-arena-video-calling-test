@@ -49,5 +49,6 @@ class VideoCallSessionModel extends Model
         ];
 
         $this->update($sessionid, $data);
+        return $this->find($sessionid);
     }
 }

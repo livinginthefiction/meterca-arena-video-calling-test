@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Sep 08, 2023 at 07:57 PM
+-- Generation Time: Sep 11, 2023 at 06:38 AM
 -- Server version: 10.6.14-MariaDB-cll-lve
 -- PHP Version: 7.2.34
 
@@ -74,6 +74,18 @@ CREATE TABLE `video_call_sessions` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `video_call_sessions`
+--
+
+INSERT INTO `video_call_sessions` (`sessionid`, `starttime`, `receivetime`, `endtime`, `duration`, `callerid`, `receiverid`) VALUES
+(15, '2023-09-11 06:23:27', '2023-09-11 06:23:32', '2023-09-11 06:24:10', 38, 2, 1),
+(14, '2023-09-11 06:12:38', '2023-09-11 06:12:42', '2023-09-11 06:13:00', 18, 2, 1),
+(13, '2023-09-11 05:50:49', '2023-09-11 05:51:01', '2023-09-11 05:51:13', 12, 2, 1),
+(12, '2023-09-11 05:47:28', '2023-09-11 05:47:32', '2023-09-11 05:48:33', 61, 2, 1),
+(11, '2023-09-11 05:45:00', '2023-09-11 05:45:04', '2023-09-11 05:46:04', 60, 2, 1),
+(10, '2023-09-11 03:53:51', '2023-09-11 03:53:55', '2023-09-11 03:54:05', 10, 2, 1);
+
+--
 -- Indexes for dumped tables
 --
 
@@ -112,7 +124,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `video_call_sessions`
 --
 ALTER TABLE `video_call_sessions`
-  MODIFY `sessionid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `sessionid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
